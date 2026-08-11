@@ -9,6 +9,17 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = Number(process.env.PORT) || 3000;
 
+// Database connection and migration
+async function initializeDatabase() {
+  try {
+    await prisma.$connect();
+    console.log('Database connected successfully');
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    process.exit(1);
+  }
+}
+
 // Middleware
 app.use(cors({
   origin: '*',
@@ -42,8 +53,10 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on http://0.0.0.0:${PORT}`);
+initializeDatabase().then(() => {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://0.0.0.0:${PORT}`);
+  });
 });
 
 // Graceful shutdown
