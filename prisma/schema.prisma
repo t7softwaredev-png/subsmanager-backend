@@ -19,6 +19,7 @@ model User {
   updatedAt DateTime   @updatedAt
 
   subscriptions UserSubscription[]
+  payments      Payment[]
 
   @@map("users")
 }
@@ -54,8 +55,26 @@ model UserSubscription {
   notes     String?
   description String?
 
+  payments  Payment[]
+
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
   @@map("user_subscriptions")
+}
+
+model Payment {
+  id             String           @id @default(cuid())
+  subscriptionId String
+  subscription   UserSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amount         Float
+  paidAt         DateTime         @default(now())
+
+  createdAt      DateTime         @default(now())
+
+  @@map("payments")
 }

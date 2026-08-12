@@ -37,12 +37,14 @@ import authRoutes from './routes/auth';
 import subscriptionRoutes from './routes/subscriptions';
 import templateRoutes from './routes/templates';
 import profileRoutes from './routes/profile';
+import paymentRoutes from './routes/payments';
 
 // Use routes
 app.use('/auth', authRoutes);
 app.use('/me/subscriptions', subscriptionRoutes);
 app.use('/templates', templateRoutes);
 app.use('/me', profileRoutes);
+app.use('/me/payments', paymentRoutes);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

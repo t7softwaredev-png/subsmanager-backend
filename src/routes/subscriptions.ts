@@ -122,6 +122,52 @@ router.patch('/:id', authMiddleware, async (req: AuthRequest, res: Response) => 
   }
 });
 
+// Mark a subscription as paid (creates a payment record and advances the renewal date)
+router.post('/:id/payments', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { amount, paidAt } = req.body;
+
+    // Verify ownership
+    const subscription = await prisma.userSubscription.findUnique({ where: { id } });
+    if (!subscription || subscription.userId !== req.userId) {
+      return res.status(403).json({ error: 'Yetkisiz erişim' });
+    }
+
+    const paymentDate = paidAt ? new Date(paidAt) : new Date();
+
+    const payment = await prisma.payment.create({
+      data: {
+        subscriptionId: subscription.id,
+        userId: req.userId!,
+        amount: amount !== undefined ? amount : subscription.price,
+        paidAt: paymentDate,
+      },
+    });
+
+    // Bir sonraki yenileme tarihini bir fatura döngüsü kadar ilerlet
+    const next = new Date(subscription.nextRenewalDate);
+    if (subscription.billingCycle === 'weekly') {
+      next.setDate(next.getDate() + 7);
+    } else if (subscription.billingCycle === 'monthly') {
+      next.setMonth(next.getMonth() + 1);
+    } else if (subscription.billingCycle === 'yearly') {
+      next.setFullYear(next.getFullYear() + 1);
+    }
+
+    const updatedSubscription = await prisma.userSubscription.update({
+      where: { id },
+      data: { nextRenewalDate: next },
+      include: { template: true },
+    });
+
+    res.status(201).json({ payment, subscription: updatedSubscription });
+  } catch (error) {
+    console.error('Error creating payment:', error);
+    res.status(500).json({ error: 'Sunucu hatası', details: error instanceof Error ? error.message : String(error) });
+  }
+});
+
 // Delete subscription
 router.delete('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
