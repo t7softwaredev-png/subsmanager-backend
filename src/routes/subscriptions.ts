@@ -122,11 +122,11 @@ router.patch('/:id', authMiddleware, async (req: AuthRequest, res: Response) => 
   }
 });
 
-// Mark a subscription as paid (creates a payment record and advances the renewal date)
+// Mark a subscription as paid/unpaid (creates a payment record and advances the renewal date)
 router.post('/:id/payments', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { amount, paidAt } = req.body;
+    const { amount, paidAt, paid } = req.body;
 
     // Verify ownership
     const subscription = await prisma.userSubscription.findUnique({ where: { id } });
@@ -141,6 +141,7 @@ router.post('/:id/payments', authMiddleware, async (req: AuthRequest, res: Respo
         subscriptionId: subscription.id,
         userId: req.userId!,
         amount: amount !== undefined ? amount : subscription.price,
+        paid: paid !== undefined ? Boolean(paid) : true,
         paidAt: paymentDate,
       },
     });
