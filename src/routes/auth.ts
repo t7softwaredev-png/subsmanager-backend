@@ -40,6 +40,7 @@ router.post('/register', async (req: Request, res: Response) => {
         id: user.id,
         email: user.email,
         name: user.name,
+        notificationsEnabled: user.notificationsEnabled,
       },
       token,
     });
@@ -77,6 +78,7 @@ router.post('/login', async (req: Request, res: Response) => {
         id: user.id,
         email: user.email,
         name: user.name,
+        notificationsEnabled: user.notificationsEnabled,
       },
       token,
     });
@@ -95,6 +97,7 @@ router.get('/me', authMiddleware, async (req: AuthRequest, res: Response) => {
         id: true,
         email: true,
         name: true,
+        notificationsEnabled: true,
       },
     });
 

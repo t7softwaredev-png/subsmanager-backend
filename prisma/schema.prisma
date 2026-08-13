@@ -15,6 +15,7 @@ model User {
   email     String     @unique
   passwordHash String
   name      String
+  notificationsEnabled Boolean @default(true)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
@@ -53,6 +54,7 @@ model UserSubscription {
   startDate DateTime
   nextRenewalDate DateTime
   status    String   @default("active")
+  renewalReminderEnabled Boolean @default(true)
   notes     String?
   description String?
 

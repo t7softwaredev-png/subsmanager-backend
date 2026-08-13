@@ -14,6 +14,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
         id: true,
         email: true,
         name: true,
+        notificationsEnabled: true,
         createdAt: true,
       },
     });
@@ -32,9 +33,9 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 // Update profile
 router.patch('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, notificationsEnabled } = req.body;
 
-    if (!name && !email) {
+    if (!name && !email && notificationsEnabled === undefined) {
       return res.status(400).json({ error: 'En az bir alan gereklidir' });
     }
 
@@ -51,11 +52,13 @@ router.patch('/', authMiddleware, async (req: AuthRequest, res: Response) => {
       data: {
         name: name !== undefined ? name : undefined,
         email: email !== undefined ? email : undefined,
+        notificationsEnabled: notificationsEnabled !== undefined ? notificationsEnabled : undefined,
       },
       select: {
         id: true,
         email: true,
         name: true,
+        notificationsEnabled: true,
         createdAt: true,
       },
     });
