@@ -24,7 +24,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 // Create subscription
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { templateId, customName, customLogoUrl, price, billingCycle, startDate, notes, description } = req.body;
+    const { templateId, customName, customLogoUrl, category, price, billingCycle, startDate, notes, description } = req.body;
 
     if (!price || !billingCycle) {
       return res.status(400).json({ error: 'Fiyat ve fatura döngüsü gereklidir' });
@@ -52,6 +52,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
         templateId: templateId || undefined,
         customName: customName || undefined,
         customLogoUrl: customLogoUrl || undefined,
+        category: category || undefined,
         price,
         billingCycle,
         startDate: start,
@@ -73,7 +74,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 router.patch('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { customName, customLogoUrl, price, billingCycle, startDate, status, notes, description } = req.body;
+    const { customName, customLogoUrl, category, price, billingCycle, startDate, status, notes, description } = req.body;
 
     // Verify ownership
     const subscription = await prisma.userSubscription.findUnique({ where: { id } });
@@ -104,6 +105,7 @@ router.patch('/:id', authMiddleware, async (req: AuthRequest, res: Response) => 
       data: {
         customName: customName !== undefined ? customName : undefined,
         customLogoUrl: customLogoUrl !== undefined ? customLogoUrl : undefined,
+        category: category !== undefined ? category : undefined,
         price: price !== undefined ? price : undefined,
         billingCycle: billingCycle !== undefined ? billingCycle : undefined,
         startDate: startDate !== undefined ? new Date(startDate) : undefined,

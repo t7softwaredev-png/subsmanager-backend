@@ -46,6 +46,7 @@ model UserSubscription {
 
   customName String?
   customLogoUrl String?
+  category  String?
 
   price     Float
   billingCycle String
